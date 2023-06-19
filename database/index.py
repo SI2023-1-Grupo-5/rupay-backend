@@ -1,0 +1,1 @@
+# TODO: criar lógica de conexão com o banco e models do ORM
