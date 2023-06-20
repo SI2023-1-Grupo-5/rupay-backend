@@ -1,0 +1,6 @@
+fastapi
+sqlalchemy
+pymysql
+uvicorn[standard]
+bcrypt
+cryptography
