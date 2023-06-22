@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
+from app.email_service import EmailService
 
 
 from .database import SessionLocal, engine
@@ -32,3 +33,8 @@ def read_user(user_collegeId: str, db:Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=404, detail='user not found')
     return db_user
+
+@app.post("/email-service/{email}")
+def send_email(email: str):
+    email_service = EmailService()
+    email_service.send_email(email)
