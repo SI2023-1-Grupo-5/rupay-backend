@@ -6,10 +6,10 @@
 - Rodar o servidor:
 
 ```shellscript
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ uvicorn app.main:app --reload
 ```
 
 ## Subindo o banco de dados com Docker Compose
@@ -17,7 +17,7 @@ uvicorn app.main:app --reload
 No diretório raíz do arquivo:
 
 ``` shellscript
-docker-compose up
+$ docker-compose up
 ```
 ### Links úteis:
 - [Download docker linux](https://docs.docker.com/desktop/install/linux-install/)
