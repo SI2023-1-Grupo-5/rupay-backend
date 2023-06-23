@@ -1,17 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
 from app.email_service import EmailService
 
 
 from .database import SessionLocal, engine
-models.Base.metadata.create_all(bind = engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-@app.get("/home")
-def root():
-    return {"message":"Hello, World"}
 
 def get_db():
     db = SessionLocal()
@@ -20,12 +16,28 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/users/",response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db:Session = Depends(get_db)):
-    db_user = crud.get_user(db, user_collegeId= user.collegeId)
-    if db_user:
-        raise HTTPException(status_code= 400, detail= 'Student already registered')
-    return crud.create_user(db=db, user = user)
+@app.post("/users/create", status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    try:
+        crud.create_user(db, user= user)
+        return {"message": "success"}
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Student with the provided id already registered'
+            )
+
+
+@app.post("/users/login", status_code=status.HTTP_200_OK)
+def read_user(user: schemas.UserBase, db: Session = Depends(get_db)):
+    try:
+        crud.auth_user(db, user=user)
+        return {"message": "success"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Login error"
+            )
 
 @app.get("/users/{user_collegeId}",response_model=schemas.User)
 def read_user(user_collegeId: str, db:Session = Depends(get_db)):

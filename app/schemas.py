@@ -1,14 +1,17 @@
 from pydantic import BaseModel
+from datetime import date
 
 
 class UserBase(BaseModel):
     collegeId: str
+    password: str
+
+
+class UserCreate(UserBase):
     name: str
     email: str
     balance: float
 
-class UserCreate(UserBase):
-    password: str
 
 class User(UserBase):
     class Config:
@@ -20,8 +23,10 @@ class CommentBase(BaseModel):
     rating: str
     createdAt: str
 
+
 class CommentCreate(CommentBase):
     userCollegeId: str
+
 
 class Comment(CommentBase):
     id: int
@@ -29,3 +34,11 @@ class Comment(CommentBase):
 
     class Config:
         orm_mode = True
+
+
+class CardRecharge(BaseModel):
+    number: str
+    name: str
+    security_code: str
+    date: date
+    valor: int
