@@ -4,8 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-mysql-connector-python = "*"
-uvicorn = "*"
 fastapi = "*"
+sqlalchemy = "*"
+pymysql = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+bcrypt = "*"
+cryptography = "*"
 
 [dev-packages]
