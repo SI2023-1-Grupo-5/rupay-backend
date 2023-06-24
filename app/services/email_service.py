@@ -1,6 +1,7 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
 from os import getenv
 import socket
 
@@ -54,9 +55,6 @@ class EmailService:
 
         return message.as_string()
 
-    def get_institucional_email(college_id: str):
-        return f"{college_id}@aluno.unb.br"
-
     def get_text_version(self, student_name: str, code: str):
         text = f"""\
         Olá, {student_name}
@@ -85,3 +83,6 @@ class EmailService:
         """
 
         return html
+    
+def get_institucional_email(college_id: str):
+    return f"{college_id}@aluno.unb.br"
