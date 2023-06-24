@@ -5,7 +5,7 @@ from app.database.schemas import UserBase as UserBaseSchema
 from app.database.schemas import UserCreate as UserCreateSchema
 from app.database.schemas import UserUpdate as UserUpdateSchema
 
-from app.services import user_service
+from app.services import user_service as UserService
 
 from sqlalchemy.orm import Session
 from app.database.init import SessionLocal
@@ -24,7 +24,7 @@ def get_db():
 
 @router.get("/{user_college_id}", response_model=UserSchema)
 def get(college_id: str, db:Session = Depends(get_db)):
-    db_user = user_service.get(db, college_id)
+    db_user = UserService.get(db, college_id)
     
     if not db_user:
         raise HTTPException(status_code=404, detail='User not found')
@@ -34,7 +34,7 @@ def get(college_id: str, db:Session = Depends(get_db)):
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create(user: UserCreateSchema, db: Session = Depends(get_db)):
     try:
-        user_service.create(db, user)
+        UserService.create(db, user)
         return {"message": "success"}
     except Exception:
         raise HTTPException(
@@ -44,11 +44,17 @@ def create(user: UserCreateSchema, db: Session = Depends(get_db)):
     
 @router.put("/{college_id}")
 def update(college_id: str, user: UserUpdateSchema, db: Session = Depends(get_db)):
-    # TODO: Check if user exists before updating
-    
+    if not UserService.get(db, college_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!"
+        )
+
     try:
-        user_service.update(db, user, college_id)
-        return {"message": "success"}
+        UserService.update(db, user, college_id)
+    
+        return "Usuário atualizado!"
+    
     except Exception as e:
         # Log the error, so we can understand exactly what happened
         print(e)
@@ -60,11 +66,17 @@ def update(college_id: str, user: UserUpdateSchema, db: Session = Depends(get_db
 
 @router.delete("/{college_id}")
 def delete(college_id: str, db: Session = Depends(get_db)):
-    # TODO: Check if user exists before deleting
+    if not UserService.get(db, college_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!"
+        )
 
     try:
-        user_service.delete(db, college_id)
-        return {"message": "success"}
+        UserService.delete(db, college_id)
+
+        return "Usuário deletado com sucesso!"
+    
     except Exception as e:
         # Log the error, so we can understand exactly what happened
         print(e)

@@ -60,3 +60,17 @@ def auth_user(db: Session, user: UserBaseSchema):
         raise Exception
     
     return query_user
+
+def activate(db: Session, college_id: str):
+    db.query(UserModel).filter(UserModel.college_id == college_id).update({
+        'is_active': True
+    })
+
+    db.commit()
+
+def deactivate(db: Session, college_id: str):
+    db.query(UserModel).filter(UserModel.college_id == college_id).update({
+        'is_active': False
+    })
+
+    db.commit()
