@@ -9,6 +9,10 @@ class UserBase(BaseModel):
     is_active: bool
     balance: float
 
+class UserLogin(BaseModel):
+    college_id: str
+    password: str
+
 class UserCreate(BaseModel):
     college_id: str
     name: str

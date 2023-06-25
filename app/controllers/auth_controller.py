@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 
 from app.database.schemas import UserBase as UserBaseSchema
+from app.database.schemas import UserLogin as UserLoginSchema
 from app.database.schemas import UserCreate as UserCreateSchema
 from app.database.schemas import UserUpdate as UserUpdateSchema
 
 from app.services import user_service as UserService
 from app.services import access_service as AccessService
+from app.services import auth_service as AuthService
 from app.services.email_service import EmailService
 
 from sqlalchemy.orm import Session
@@ -58,24 +60,41 @@ def register(user: UserCreateSchema, db:Session = Depends(get_db)):
     email_service.send_email(email, user.name, code)
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-def login(user: UserBaseSchema, db: Session = Depends(get_db)):
-    try:
-        UserService.auth_user(db, user=user)
-        return "Usuário logado!"
-    except Exception as e:
+def login(user: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
+    expected_user = UserService.get(db, user.college_id)
+    
+    if not expected_user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Login error"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!"
         )
 
+    user_password = UserService.get_hashed_password(user.password)
+
+    if expected_user.password != user_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Wrong password"
+        )
+
+    token = AuthService.create_token({ "college_id": user.college_id })
+    
+    response.set_cookie(key="session", value=token)
+
+    return "Usuário autenticado!"
+
 @router.post("/request-access")
-def request_access(college_id: str, access_code: str, db: Session = Depends(get_db)):
+def request_access(college_id: str, access_code: str, response: Response, db: Session = Depends(get_db)):
     if not AccessService.get(db, college_id, access_code):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Access code is not valid!"
         )
     
     UserService.activate(db, college_id)
+
+    token = AuthService.create_token({ "college_id": college_id })
+    
+    response.set_cookie(key="session", value=token)
 
     return "Usuário autenticado!"
