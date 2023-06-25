@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.schemas import User as UserSchema
 from app.database.schemas import UserBase as UserBaseSchema
 from app.database.schemas import UserCreate as UserCreateSchema
-from app.database.schemas import UserUpdate as UserUpdateSchema
+from app.database.schemas import UserUpdateInfo as UserUpdateInfoSchema
 
 from app.services import user_service
 
@@ -24,12 +24,12 @@ def get_db():
 
 @router.get("/{user_college_id}", response_model=UserSchema)
 def get(college_id: str, db:Session = Depends(get_db)):
-    db_user = user_service.get(db, college_id)
     
-    if not db_user:
+    try:
+        return user_service.get(db, college_id)
+    except:
         raise HTTPException(status_code=404, detail='User not found')
     
-    return db_user
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create(user: UserCreateSchema, db: Session = Depends(get_db)):
@@ -43,7 +43,7 @@ def create(user: UserCreateSchema, db: Session = Depends(get_db)):
         )
     
 @router.put("/{college_id}")
-def update(college_id: str, user: UserUpdateSchema, db: Session = Depends(get_db)):
+def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(get_db)):
     # TODO: Check if user exists before updating
     
     try:

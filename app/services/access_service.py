@@ -29,3 +29,4 @@ def generate_code():
 
 def delete(db: Session, college_id: str):
     db.query(AccessModel).filter(AccessModel.user_college_id == college_id).delete()
+    
