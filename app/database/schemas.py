@@ -18,10 +18,9 @@ class UserCreate(BaseModel):
     name: str
     password: str
 
-class UserUpdate(BaseModel):
+class UserUpdateInfo(BaseModel):
     name: str
     password: str
-    balance: float
     is_active: bool
 
 class User(UserBase):
@@ -48,4 +47,4 @@ class CardRecharge(BaseModel):
     name: str
     security_code: str
     date: date
-    valor: int
+    value: int
