@@ -10,5 +10,7 @@ pymysql = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 bcrypt = "*"
 cryptography = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
