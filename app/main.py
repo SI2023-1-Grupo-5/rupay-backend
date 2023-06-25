@@ -17,5 +17,4 @@ app.include_router(PaymentController)
 # TODO: Turn controllers into classes and inject db (?)
 # TODO: Add a directory for custom exceptions (?)
 # TODO: Create a DB class with methods implementing all sql basic operations (SELECT, INSERT, UPDATE and DELETE)
-# TODO: Login system
-# TODO: Authentication and Session system (JWT)
+# TODO: Authentication Middleware

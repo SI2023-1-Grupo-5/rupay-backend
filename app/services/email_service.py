@@ -28,10 +28,10 @@ class EmailService:
             print(e)
             self.server.quit()
 
-    def send_email(self, email: str):
+    def send_email(self, email: str, name: str, code: str):
         print(f">>> Enviando email para {email}....")
         try:
-            message = self.get_formatted_email(email, "Kleber", "162524")
+            message = self.get_formatted_email(email, name, code)
             
             self.server.sendmail(self.sender, email, message)
             
