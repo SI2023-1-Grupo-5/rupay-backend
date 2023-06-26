@@ -29,15 +29,15 @@ class User(UserBase):
 
 class CommentBase(BaseModel):
     content: str
-    rating: str
-    createdAt: str
+    rating: int
 
 class CommentCreate(CommentBase):
-    userCollegeId: str
+    user_college_id: str
 
 class Comment(CommentBase):
     id: int
-    user: User
+    user_college_id: str
+    createdAt: date
 
     class Config:
         orm_mode = True

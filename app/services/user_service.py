@@ -10,7 +10,7 @@ from app.database.schemas import UserUpdateInfo as UserUpdateInfoSchema
 import bcrypt
 
 
-def create(db: Session, user: UserCreateSchema):
+def create_user(db: Session, user: UserCreateSchema):
     db_user = UserModel(
         college_id=user.college_id,
         name=user.name,
@@ -27,7 +27,7 @@ def create(db: Session, user: UserCreateSchema):
     return db_user
 
 
-def get(db: Session, college_id: str):
+def get_user(db: Session, college_id: str):
     return db.query(UserModel).filter(UserModel.college_id == college_id).first()
 
 def get_by_email(db: Session, email: str):
@@ -35,7 +35,7 @@ def get_by_email(db: Session, email: str):
 
 
 def update_info(db: Session, user: UserUpdateInfoSchema, college_id: str):
-    db_user = get(db, college_id)
+    db_user = get_user(db, college_id)
 
     db_user.name = user.name
     db_user.password = get_hashed_password(user.password)
@@ -45,7 +45,7 @@ def update_info(db: Session, user: UserUpdateInfoSchema, college_id: str):
 
 
 def update_balance(db: Session, value: float, college_id: str):
-    user = get(db, college_id)
+    user = get_user(db, college_id)
     user.balance += value
     db.commit()
 

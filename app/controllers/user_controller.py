@@ -24,7 +24,7 @@ def get_db():
 
 @router.get("/{user_college_id}", response_model=UserSchema)
 def get(college_id: str, db:Session = Depends(get_db)):
-    db_user = UserService.get(db, college_id)
+    db_user = UserService.get_user(db, college_id)
     
     try:
         return db_user
@@ -35,7 +35,7 @@ def get(college_id: str, db:Session = Depends(get_db)):
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create(user: UserCreateSchema, db: Session = Depends(get_db)):
     try:
-        UserService.create(db, user)
+        UserService.create_user(db, user)
         return {"message": "success"}
     except Exception:
         raise HTTPException(
@@ -45,7 +45,7 @@ def create(user: UserCreateSchema, db: Session = Depends(get_db)):
     
 @router.put("/{college_id}")
 def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(get_db)):
-    if not UserService.get(db, college_id):
+    if not UserService.get_user(db, college_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found!"
@@ -67,7 +67,7 @@ def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(ge
 
 @router.delete("/{college_id}")
 def delete(college_id: str, db: Session = Depends(get_db)):
-    if not UserService.get(db, college_id):
+    if not UserService.get_user(db, college_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found!"
