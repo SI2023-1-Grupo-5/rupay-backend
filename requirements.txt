@@ -4,3 +4,4 @@ pymysql
 uvicorn[standard]
 bcrypt
 cryptography
+python-jose[cryptography]
