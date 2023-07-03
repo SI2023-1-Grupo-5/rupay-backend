@@ -2,7 +2,8 @@ from typing import Union, Any
 from datetime import datetime, timedelta
 from jose import jwt
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 30 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
+# ACCESS_TOKEN_EXPIRE_MINUTES = 1  # 1 minute
 ALGORITHM = "HS256"
 
 # TODO: get this from environment
@@ -18,3 +19,14 @@ def create_token(subject: Union[str, Any], expires_delta: int = None) -> str:
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
     
     return encoded_jwt
+
+def is_cookie_valid(token):
+    try:
+        jwt.decode(token, JWT_SECRET_KEY, ALGORITHM)
+    except Exception as e:
+        print(e)
+
+        return False
+    
+    return True
+    

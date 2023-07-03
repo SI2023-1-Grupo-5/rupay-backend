@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 
 from app.database.schemas import User as UserSchema
 from app.database.schemas import UserBase as UserBaseSchema
@@ -22,28 +23,34 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/{user_college_id}", response_model=UserSchema)
+@router.get("/{college_id}", status_code=status.HTTP_200_OK)
 def get(college_id: str, db:Session = Depends(get_db)):
     db_user = UserService.get_user(db, college_id)
     
-    try:
-        return db_user
-    except:
-        raise HTTPException(status_code=404, detail='User not found')
-    
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="User not found!"
+        )
 
+    return JSONResponse(
+        content={ "email": db_user.email, "balance": db_user.balance }, 
+        status_code=200
+    )
+    
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create(user: UserCreateSchema, db: Session = Depends(get_db)):
     try:
-        UserService.create_user(db, user)
-        return {"message": "success"}
+        created_user = UserService.create_user(db, user)
+        return JSONResponse(content=created_user, status_code=201)
+    
     except Exception:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Student with the provided id already registered'
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Student with the provided college id already registered"
         )
-    
-@router.put("/{college_id}")
+
+@router.put("/{college_id}", status_code=status.HTTP_200_OK)
 def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(get_db)):
     if not UserService.get_user(db, college_id):
         raise HTTPException(
@@ -52,9 +59,8 @@ def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(ge
         )
 
     try:
-        UserService.update(db, user, college_id)
-    
-        return "Usuário atualizado!"
+        updated_user = UserService.update(db, user, college_id)
+        return JSONResponse(content=updated_user, status_code=200)
     
     except Exception as e:
         # Log the error, so we can understand exactly what happened
@@ -65,7 +71,7 @@ def update(college_id: str, user: UserUpdateInfoSchema, db: Session = Depends(ge
             detail="Student couldn't be deleted!"
         )
 
-@router.delete("/{college_id}")
+@router.delete("/{college_id}", status_code=status.HTTP_200_OK)
 def delete(college_id: str, db: Session = Depends(get_db)):
     if not UserService.get_user(db, college_id):
         raise HTTPException(
@@ -75,8 +81,7 @@ def delete(college_id: str, db: Session = Depends(get_db)):
 
     try:
         UserService.delete(db, college_id)
-
-        return "Usuário deletado com sucesso!"
+        return JSONResponse(content="Usuário deletado com sucesso!", status_code=200)
     
     except Exception as e:
         # Log the error, so we can understand exactly what happened

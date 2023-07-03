@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi.responses import JSONResponse
 
 import bcrypt
 
@@ -31,7 +32,6 @@ def get_db():
 def register(user: UserCreateSchema, db:Session = Depends(get_db)):
     college_id = user.college_id
     email = f"{college_id}@aluno.unb.br"
-    code = 00000
 
     existent_user = UserService.get_user(db, college_id) 
 
@@ -60,6 +60,8 @@ def register(user: UserCreateSchema, db:Session = Depends(get_db)):
     email_service = EmailService()
     email_service.send_email(email, user.name, code)
 
+    return JSONResponse(content="Usuário registrado com sucesso!", status_code=201)
+
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login(user: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
     expected_user = UserService.get_user(db, user.college_id)
@@ -70,20 +72,19 @@ def login(user: UserLoginSchema, response: Response, db: Session = Depends(get_d
             detail="User not found!"
         )
 
-    # user_password = UserService.get_hashed_password(user.password)
-
-    # if expected_user.password != user_password:
     if not bcrypt.checkpw(user.password.encode('utf-8'), expected_user.password.encode('utf-8')):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Wrong password"
+            detail="Wrong password!"
         )
 
     token = AuthService.create_token({ "college_id": user.college_id })
     
     response.set_cookie(key="session", value=token)
+    response.body = "Usuário autenticado com sucesso!"
+    response.status_code = 200
 
-    return "Usuário autenticado!"
+    return response
 
 @router.post("/request-access")
 def request_access(college_id: str, access_code: str, response: Response, db: Session = Depends(get_db)):
@@ -95,8 +96,12 @@ def request_access(college_id: str, access_code: str, response: Response, db: Se
     
     UserService.activate(db, college_id)
 
+    AccessService.delete(db, college_id)
+
     token = AuthService.create_token({ "college_id": college_id })
     
     response.set_cookie(key="session", value=token)
+    response.body = "Usuário autenticado com sucesso!"
+    response.status_code = 200
 
-    return "Usuário autenticado!"
+    return response
