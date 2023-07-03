@@ -9,13 +9,12 @@ from app.database.schemas import UserUpdateInfo as UserUpdateInfoSchema
 
 import bcrypt
 
-
 def create_user(db: Session, user: UserCreateSchema):
     db_user = UserModel(
         college_id=user.college_id,
         name=user.name,
         email=f"{user.college_id}@aluno.unb.br",
-        password=get_hashed_password(user.password),
+        password=hash_password(user.password),
         is_active=False,
         balance=0.00
     )
@@ -26,29 +25,28 @@ def create_user(db: Session, user: UserCreateSchema):
 
     return db_user
 
-
 def get_user(db: Session, college_id: str):
-    return db.query(UserModel).filter(UserModel.college_id == college_id).first()
+    return db.query(UserModel).filter(
+        UserModel.college_id == college_id, 
+        UserModel.is_active == 1
+    ).first() 
 
 def get_by_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()
-
 
 def update_info(db: Session, user: UserUpdateInfoSchema, college_id: str):
     db_user = get_user(db, college_id)
 
     db_user.name = user.name
-    db_user.password = get_hashed_password(user.password)
+    db_user.password = hash_password(user.password)
     db_user.is_active = user.is_active
 
     db.commit()
-
 
 def update_balance(db: Session, value: float, college_id: str):
     user = get_user(db, college_id)
     user.balance += value
     db.commit()
-
 
 def delete(db: Session, college_id: str):
     db.query(AccessModel).filter(
@@ -70,8 +68,5 @@ def deactivate(db: Session, college_id: str):
 
     db.commit()
 
-def get_hashed_password(password: str):
-    return bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt()
-    )  
+def hash_password(password: str):  
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())  

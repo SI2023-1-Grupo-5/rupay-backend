@@ -20,7 +20,7 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/{college_id}", response_model=list[CommentSchemma])
+@router.get("/{college_id}")
 def get_comment_by_user(college_id: str, db:Session = Depends(get_db)):  
     try:
         return CommentService.get_comments(db, college_id)
