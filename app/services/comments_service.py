@@ -9,6 +9,7 @@ from app.services import user_service as UserService
 
 import datetime
 
+
 def create_comment(db: Session, comment: CommentCreateSchema):
     db_comment = CommentModel(**comment.dict())
 

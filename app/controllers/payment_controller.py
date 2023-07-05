@@ -21,7 +21,7 @@ def get_db():
         db.close()
 
 
-@router.put("/card/{user_college_id}", status_code=status.HTTP_200_OK)
+@router.put("/card/{college_id}", status_code=status.HTTP_200_OK)
 def card_recharge(college_id: str, card: CardRechargeSchema, db: Session = Depends(get_db)):
 
     try:
