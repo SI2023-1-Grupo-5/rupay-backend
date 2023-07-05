@@ -30,6 +30,7 @@ class User(UserBase):
 class CommentBase(BaseModel):
     content: str
     rating: int
+    campus: str
 
 class CommentCreate(CommentBase):
     user_college_id: str
@@ -48,6 +49,7 @@ class Comment(BaseModel):
     content: str
     created_at: date
     rating: int
+    campus: str
 
 class CardRecharge(BaseModel):
     number: str

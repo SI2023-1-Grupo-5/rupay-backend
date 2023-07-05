@@ -8,6 +8,8 @@ from app.services import comments_service as CommentService
 from sqlalchemy.orm import Session
 from app.database.init import SessionLocal
 
+CAMPUS = ['planaltina', 'darcy', 'ceilandia', 'gama']
+
 router = APIRouter(
     prefix='/comment',
     tags=['Comment']
@@ -24,14 +26,20 @@ def get_db():
 def get_all(db: Session = Depends(get_db)):
     return CommentService.get_all(db)
 
-@router.get("/today")
-def get_all_from_today(db: Session = Depends(get_db)):
-    return CommentService.get_all_from_today(db)
+@router.get("/today/{campus}")
+def get_all_from_today(campus: str, db: Session = Depends(get_db)):
+    if campus not in CAMPUS:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campus inválido!")
+
+    return CommentService.get_all_from_today(db, campus)
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_comment(user: CommentCreateSchema, db: Session = Depends(get_db)):
+def create_comment(comment: CommentCreateSchema, db: Session = Depends(get_db)):
+    if comment.campus not in CAMPUS:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campus inválido!")
+    
     try:
-        CommentService.create_comment(db, user)
+        CommentService.create_comment(db, comment)
         return {"message": "success"}
     except Exception as e:
         raise HTTPException(
@@ -39,6 +47,10 @@ def create_comment(user: CommentCreateSchema, db: Session = Depends(get_db)):
             detail= e.args
         )
 
+@router.get("/menu-links/{id}")
+def get_menu_links(id: int):
+    return CommentService.get_menu_links(id)
+
 @router.get("/menu-links")
-def get_menu_links(db: Session = Depends(get_db)):
-    return CommentService.get_menu_links(db)
+def get_menu_links():
+    return CommentService.get_menu_links()

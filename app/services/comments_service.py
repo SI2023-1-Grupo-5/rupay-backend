@@ -19,7 +19,8 @@ def create_comment(db: Session, comment: CommentCreateSchema):
         content=comment.content,
         rating=comment.rating,
         user_college_id=comment.user_college_id,
-        created_at=current_date
+        created_at=current_date,
+        campus=comment.campus
     )
 
     db.add(db_comment)
@@ -39,10 +40,13 @@ def get_all(db: Session):
 
     return formatted_comments
 
-def get_all_from_today(db: Session):
+def get_all_from_today(db: Session, campus: str):
     current_date = datetime.datetime.now().isoformat().split("T")[0]
 
-    comments = db.query(CommentModel).filter(CommentModel.created_at > current_date).order_by(CommentModel.created_at).all()
+    comments = db.query(CommentModel).filter(
+        CommentModel.created_at > current_date, 
+        CommentModel.campus == campus
+    ).order_by(CommentModel.created_at).all()
     
     formatted_comments = []
 
@@ -64,10 +68,11 @@ def format_comment(db: Session, comment: CommentSchema):
         "rating": comment.rating,
         "created_at_day": timestamp[0],
         "created_at_time": timestamp[1],
-        "content": comment.content
+        "content": comment.content,
+        "campus": comment.campus
     }
 
-def get_menu_links():
+def get_menu_links(id: int = None):
     fp = urllib.request.urlopen("https://ru.unb.br/index.php/cardapio-refeitorio", context=ssl._create_unverified_context())
     mybytes = fp.read()
 
@@ -85,7 +90,7 @@ def get_menu_links():
             formatted_link = slice.split(">ISM")[0][:-18]
             valid_links.append(formatted_link)
 
-    return [
+    menus = [
         {
             "id": 1,
             "name": "Darcy Ribeiro",
@@ -107,3 +112,8 @@ def get_menu_links():
             "link": f"https://ru.unb.br/{valid_links[3]}"
         }
     ]
+
+    if id: 
+        return [menus[id-1]]
+
+    return menus

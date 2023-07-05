@@ -21,6 +21,7 @@ class Comment(Base):
     rating = Column(SmallInteger, nullable=False, default=0)
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     user_college_id = Column(VARCHAR(9), ForeignKey("users.college_id"))
+    campus = Column(VARCHAR(128), nullable=False)
 
 class Access(Base):
     __tablename__ = 'access'
