@@ -12,5 +12,6 @@ bcrypt = "*"
 cryptography = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
+requests = "*"
 
 [dev-packages]
