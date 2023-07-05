@@ -37,10 +37,17 @@ class CommentCreate(CommentBase):
 class Comment(CommentBase):
     id: int
     user_college_id: str
-    createdAt: date
+    created_at: date
 
     class Config:
         orm_mode = True
+
+class Comment(BaseModel):
+    id: int
+    user_college_id: str
+    content: str
+    created_at: date
+    rating: int
 
 class CardRecharge(BaseModel):
     number: str

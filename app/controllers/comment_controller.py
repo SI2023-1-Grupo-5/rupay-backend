@@ -20,13 +20,13 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/{college_id}")
-def get_comment_by_user(college_id: str, db:Session = Depends(get_db)):  
-    try:
-        return CommentService.get_comments(db, college_id)
-    except:
-        raise HTTPException(status_code=404, detail='User not found')
-    
+@router.get("")
+def get_all(db: Session = Depends(get_db)):
+    return CommentService.get_all(db)
+
+@router.get("/today")
+def get_all_from_today(db: Session = Depends(get_db)):
+    return CommentService.get_all_from_today(db)
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_comment(user: CommentCreateSchema, db: Session = Depends(get_db)):
@@ -38,8 +38,3 @@ def create_comment(user: CommentCreateSchema, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail= e.args
         )
-
-
-# TODO: Exceptions should be in services, not in controllers (?)
-# TODO: Add proper response type/model for each route
-# TODO: Add proper response for each route, i.e REST patterns for HTTP methods
