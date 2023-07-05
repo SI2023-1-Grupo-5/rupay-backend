@@ -19,7 +19,7 @@ class Comment(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text)
     rating = Column(SmallInteger, nullable=False, default=0)
-    createdAt = Column(DateTime, nullable=False, server_default=func.now())
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
     user_college_id = Column(VARCHAR(9), ForeignKey("users.college_id"))
 
 class Access(Base):

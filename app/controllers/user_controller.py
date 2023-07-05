@@ -91,8 +91,3 @@ def delete(college_id: str, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Student couldn't be deleted!"
         )
-
-
-# TODO: Exceptions should be in services, not in controllers (?)
-# TODO: Add proper response type/model for each route
-# TODO: Add proper response for each route, i.e REST patterns for HTTP methods
