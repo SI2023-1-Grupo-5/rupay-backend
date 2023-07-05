@@ -34,7 +34,7 @@ def get(college_id: str, db:Session = Depends(get_db)):
         )
 
     return JSONResponse(
-        content={ "email": db_user.email, "balance": db_user.balance }, 
+        content={"name": db_user.name, "email": db_user.email, "balance": str(db_user.balance) }, 
         status_code=200
     )
     
