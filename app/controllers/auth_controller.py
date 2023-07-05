@@ -80,7 +80,7 @@ def login(user: UserLoginSchema, response: Response, db: Session = Depends(get_d
 
     token = AuthService.create_token({ "college_id": user.college_id })
     
-    response.set_cookie(key="session", value=token)
+    response.set_cookie(key="session", value=token, httponly=True)
     response.body = "Usuário autenticado com sucesso!"
     response.status_code = 200
 
