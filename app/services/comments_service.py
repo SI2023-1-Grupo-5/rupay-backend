@@ -8,7 +8,9 @@ from app.database.schemas import Comment as CommentSchema
 from app.services import user_service as UserService
 
 import datetime
-
+import urllib.request
+import ssl
+import re
 
 def create_comment(db: Session, comment: CommentCreateSchema):
     db_comment = CommentModel(**comment.dict())
@@ -57,3 +59,44 @@ def format_comment(db: Session, comment: CommentSchema):
         "created_at_time": timestamp[1],
         "content": comment.content
     }
+
+def get_menu_links():
+    fp = urllib.request.urlopen("https://ru.unb.br/index.php/cardapio-refeitorio", context=ssl._create_unverified_context())
+    mybytes = fp.read()
+
+    mystr = mybytes.decode("utf8")
+    fp.close()
+
+    indexes = [m.start() for m in re.finditer('images/Artigos', mystr)]
+
+    valid_links = []
+
+    for idx in indexes:
+        slice = mystr[idx:idx+200]
+
+        if ">ISM" in slice:
+            formatted_link = slice.split(">ISM")[0][:-18]
+            valid_links.append(formatted_link)
+
+    return [
+        {
+            "id": 1,
+            "name": "Darcy Ribeiro",
+            "link": f"https://ru.unb.br/{valid_links[0]}"
+        },
+        {
+            "id": 2,
+            "name": "Ceilândia",
+            "link": f"https://ru.unb.br/{valid_links[1]}"
+        },
+        {
+            "id": 3,
+            "name": "Gama",
+            "link": f"https://ru.unb.br/{valid_links[2]}"
+        },
+        {
+            "id": 4,
+            "name": "Planaltina",
+            "link": f"https://ru.unb.br/{valid_links[3]}"
+        }
+    ]

@@ -38,3 +38,7 @@ def create_comment(user: CommentCreateSchema, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail= e.args
         )
+
+@router.get("/menu-links")
+def get_menu_links(db: Session = Depends(get_db)):
+    return CommentService.get_menu_links(db)
