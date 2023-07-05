@@ -13,7 +13,14 @@ import ssl
 import re
 
 def create_comment(db: Session, comment: CommentCreateSchema):
-    db_comment = CommentModel(**comment.dict())
+    current_date = datetime.datetime.now().isoformat()
+
+    db_comment = CommentModel(
+        content=comment.content,
+        rating=comment.rating,
+        user_college_id=comment.user_college_id,
+        created_at=current_date
+    )
 
     db.add(db_comment)
     db.commit()
